@@ -3,69 +3,157 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CareSync | Appointment Booking</title>
+  <title>CareSync Clinic Portal</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <h1>CareSync Clinic Portal</h1>
-    <p>Book and manage your healthcare appointments online</p>
-    <div style="margin-top: 15px; display: flex; justify-content: center; gap: 12px;">
-      <button type="button" onclick="showTab('home')" style="background: #ffffff; color: #0b4f8a; border: none; padding: 8px 18px; border-radius: 5px; font-weight: bold; cursor: pointer;">Home</button>
-      <button type="button" onclick="showTab('privacy')" style="background: #ffffff; color: #0b4f8a; border: none; padding: 8px 18px; border-radius: 5px; font-weight: bold; cursor: pointer;">Privacy</button>
+  <header class="portal-header">
+    <div class="header-inner">
+      <div>
+        <h1>CareSync Clinic Portal</h1>
+        <p>Book and manage your healthcare appointments online</p>
+      </div>
+      <div id="userControls" class="user-controls hidden">
+        <span id="userGreeting" class="user-badge"></span>
+        <button onclick="logout()" class="btn-logout">Log Out</button>
+      </div>
     </div>
   </header>
 
-  <main id="home-section" class="container">
-    <!-- FEATURE 1: BOOKING FORM -->
-    <section class="card">
-      <h2>1. Book an Appointment</h2>
-      <div id="statusMessage" class="status hidden"></div>
-      <form id="bookingForm">
-        <label>Patient Full Name
-          <input type="text" id="patientName" placeholder="e.g., Jordan Lee" required />
-        </label>
-        <label>Email Address
-          <input type="email" id="patientEmail" placeholder="e.g., jordan@example.com" required />
-        </label>
-        <label>Department
-          <select id="department" required>
-            <option value="General Practice">General Practice</option>
-            <option value="Dental Care">Dental Care</option>
-            <option value="Pediatrics">Pediatrics</option>
-            <option value="Dermatology">Dermatology</option>
-          </select>
-        </label>
-        <label>Preferred Date & Time
-          <input type="datetime-local" id="appointmentDate" required />
-        </label>
-        <button type="submit" class="btn-primary">Confirm Booking</button>
+  <main class="main-wrapper">
+    <div id="statusMessage" class="alert hidden" role="alert"></div>
+
+    <section id="authSection" class="auth-card">
+      <div class="auth-tabs">
+        <button id="tabLogin" class="auth-tab active" onclick="showAuthMode('login')">Sign In</button>
+        <button id="tabRegister" class="auth-tab" onclick="showAuthMode('register')">Create Account</button>
+      </div>
+
+      <form id="loginForm">
+        <h2>Portal Sign In</h2>
+        <label for="loginEmail">Email Address</label>
+        <input type="email" id="loginEmail" required placeholder="e.g., jordan@example.com" />
+
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" required placeholder="Enter your password" />
+
+        <button type="submit" class="btn-primary">Sign In</button>
       </form>
+
+      <form id="registerForm" class="hidden">
+        <h2>Create Account</h2>
+        <label for="regRole">Account Type</label>
+        <select id="regRole" onchange="toggleStaffCode()">
+          <option value="patient">Patient (Private Personal Records)</option>
+          <option value="staff">Clinic Staff / Admin (All Departments)</option>
+        </select>
+
+        <div id="staffCodeGroup" class="hidden">
+          <label for="staffCode">Clinic Staff Code (Use: CLINIC2026)</label>
+          <input type="text" id="staffCode" placeholder="Enter clinic access code" />
+        </div>
+
+        <label for="regName">Full Name</label>
+        <input type="text" id="regName" required placeholder="e.g., Jordan Lee" />
+
+        <label for="regEmail">Email Address</label>
+        <input type="email" id="regEmail" required placeholder="e.g., jordan@example.com" />
+
+        <label for="regPassword">Password</label>
+        <input type="password" id="regPassword" required minlength="6" placeholder="Minimum 6 characters" />
+
+        <label class="privacy-check">
+          <input type="checkbox" id="privacyConsent" required />
+          <span>I agree to the <a href="#" onclick="togglePrivacyModal(true); return false;">Patient Privacy Policy</a>.</span>
+        </label>
+
+        <button type="submit" class="btn-primary">Register &amp; Enter Portal</button>
+      </form>
+
+      <div class="privacy-footer">
+        Privacy Protected: Patient appointments are isolated per account and encrypted.
+      </div>
     </section>
 
-    <!-- FEATURE 2: VIEW & CANCEL APPOINTMENTS -->
-    <section class="card">
-      <h2>2. Manage Appointments</h2>
-      <input type="text" id="searchInput" placeholder="Filter by patient name or department..." />
-      <div id="appointmentsList" class="list"></div>
+    <section id="portalSection" class="hidden">
+      <div id="reminderBar" class="reminder-banner hidden" role="status">
+        <strong>Upcoming Appointment Reminder:</strong> <span id="reminderText"></span>
+      </div>
+
+      <div class="portal-grid">
+        <div class="card">
+          <h2>1. Book an Appointment</h2>
+          <form id="bookingForm">
+            <label for="patientName">Patient Full Name</label>
+            <input type="text" id="patientName" required placeholder="e.g., Jordan Lee" />
+
+            <label for="patientEmail">Email Address</label>
+            <input type="email" id="patientEmail" required placeholder="e.g., jordan@example.com" />
+
+            <label for="department">Department</label>
+            <select id="department" required>
+              <option value="General Practice">General Practice</option>
+              <option value="Dental Care">Dental Care</option>
+              <option value="Pediatrics">Pediatrics</option>
+              <option value="Cardiology">Cardiology</option>
+              <option value="Dermatology">Dermatology</option>
+            </select>
+
+            <label for="dateTime">Preferred Date &amp; Time</label>
+            <input type="datetime-local" id="dateTime" required />
+
+            <button type="submit" class="btn-primary">Confirm Booking</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="manage-header">
+            <h2>2. Manage Appointments</h2>
+            <span id="privacyScopeBadge" class="scope-badge">Private View</span>
+          </div>
+          <input
+            type="text"
+            id="searchFilter"
+            class="filter-input"
+            placeholder="Filter by patient name or department..."
+            oninput="renderAppointments()"
+          />
+          <div id="appointmentsContainer" class="appointments-list">
+            <p class="muted">Loading appointments...</p>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
-  <!-- PRIVACY SECTION -->
-  <section id="privacy-section" class="container" style="display: none;">
-    <div class="card" style="width: 100%; max-width: 800px; margin: 0 auto;">
-      <h2>Privacy Policy</h2>
-      <p>CareSync Clinic Portal collects patient names, email addresses, and appointment details solely to schedule and manage healthcare visits.</p>
-      <p>Your personal information is stored securely in our database and is never sold or shared with unauthorized third parties.</p>
+  <div id="rescheduleModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <h3>Reschedule Appointment</h3>
+      <form id="rescheduleForm">
+        <input type="hidden" id="rescheduleId" />
+        <label for="newDateTime">Select New Date &amp; Time</label>
+        <input type="datetime-local" id="newDateTime" required />
+        <div class="modal-buttons">
+          <button type="submit" class="btn-primary">Save New Time</button>
+          <button type="button" class="btn-secondary" onclick="closeReschedule()">Close</button>
+        </div>
+      </form>
     </div>
-  </section>
+  </div>
+
+  <div id="privacyModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <h3>CareSync Patient Privacy Notice</h3>
+      <p class="privacy-copy">
+        CareSync Clinic Portal protects patient confidentiality through encrypted password hashing,
+        HTTP-only session cookies, and strict role-based data isolation. Patients can only view,
+        reschedule, or cancel their own records. Authorized clinic staff can view clinic-wide schedules
+        to coordinate patient care.
+      </p>
+      <button type="button" class="btn-primary" onclick="togglePrivacyModal(false)">I Understand</button>
+    </div>
+  </div>
 
   <script src="app.js"></script>
-  <script>
-    function showTab(tab) {
-      document.getElementById('home-section').style.display = tab === 'home' ? '' : 'none';
-      document.getElementById('privacy-section').style.display = tab === 'privacy' ? '' : 'none';
-    }
-  </script>
 </body>
 </html>
