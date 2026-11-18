@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CareSync | Appointment Booking</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>CareSync Clinic Portal</h1>
+    <p>Book and manage your healthcare appointments online</p>
+    <div style="margin-top: 15px; display: flex; justify-content: center; gap: 12px;">
+      <button type="button" onclick="showTab('home')" style="background: #ffffff; color: #0b4f8a; border: none; padding: 8px 18px; border-radius: 5px; font-weight: bold; cursor: pointer;">Home</button>
+      <button type="button" onclick="showTab('privacy')" style="background: #ffffff; color: #0b4f8a; border: none; padding: 8px 18px; border-radius: 5px; font-weight: bold; cursor: pointer;">Privacy</button>
+    </div>
+  </header>
+
+  <main id="home-section" class="container">
+    <!-- FEATURE 1: BOOKING FORM -->
+    <section class="card">
+      <h2>1. Book an Appointment</h2>
+      <div id="statusMessage" class="status hidden"></div>
+      <form id="bookingForm">
+        <label>Patient Full Name
+          <input type="text" id="patientName" placeholder="e.g., Jordan Lee" required />
+        </label>
+        <label>Email Address
+          <input type="email" id="patientEmail" placeholder="e.g., jordan@example.com" required />
+        </label>
+        <label>Department
+          <select id="department" required>
+            <option value="General Practice">General Practice</option>
+            <option value="Dental Care">Dental Care</option>
+            <option value="Pediatrics">Pediatrics</option>
+            <option value="Dermatology">Dermatology</option>
+          </select>
+        </label>
+        <label>Preferred Date & Time
+          <input type="datetime-local" id="appointmentDate" required />
+        </label>
+        <button type="submit" class="btn-primary">Confirm Booking</button>
+      </form>
+    </section>
+
+    <!-- FEATURE 2: VIEW & CANCEL APPOINTMENTS -->
+    <section class="card">
+      <h2>2. Manage Appointments</h2>
+      <input type="text" id="searchInput" placeholder="Filter by patient name or department..." />
+      <div id="appointmentsList" class="list"></div>
+    </section>
+  </main>
+
+  <!-- PRIVACY SECTION -->
+  <section id="privacy-section" class="container" style="display: none;">
+    <div class="card" style="width: 100%; max-width: 800px; margin: 0 auto;">
+      <h2>Privacy Policy</h2>
+      <p>CareSync Clinic Portal collects patient names, email addresses, and appointment details solely to schedule and manage healthcare visits.</p>
+      <p>Your personal information is stored securely in our database and is never sold or shared with unauthorized third parties.</p>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
+  <script>
+    function showTab(tab) {
+      document.getElementById('home-section').style.display = tab === 'home' ? '' : 'none';
+      document.getElementById('privacy-section').style.display = tab === 'privacy' ? '' : 'none';
+    }
+  </script>
+</body>
+</html>
